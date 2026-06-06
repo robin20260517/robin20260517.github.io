@@ -657,10 +657,34 @@
     }
 
     function renderAvatar(player, size) {
+      const avatars = {
+        'neymar': 'https://r2.thesportsdb.com/images/media/player/cutout/av4ar01767782947.png',
+        'vinicius': 'https://r2.thesportsdb.com/images/media/player/cutout/ejuxsh1750271859.png',
+        'raphinha': 'https://r2.thesportsdb.com/images/media/player/cutout/w94spe1726510018.png',
+        'endrick': 'https://r2.thesportsdb.com/images/media/player/cutout/5yb3rv1733653315.png',
+        'alisson': 'https://r2.thesportsdb.com/images/media/player/cutout/8amq961757087569.png',
+        'casemiro': 'https://r2.thesportsdb.com/images/media/player/cutout/ydr3j41766826524.png',
+        'bruno-guimaraes': 'https://r2.thesportsdb.com/images/media/player/cutout/qr8gk01766824971.png',
+        'marquinhos': 'https://r2.thesportsdb.com/images/media/player/cutout/7x9gtl1766335348.png',
+        'gabriel-magalhaes': 'https://r2.thesportsdb.com/images/media/player/cutout/trz5x71769331076.png',
+        'santiago-gimenez': 'https://r2.thesportsdb.com/images/media/player/cutout/j63fz01758892529.png',
+        'raul-jimenez': 'https://r2.thesportsdb.com/images/media/player/cutout/w4chsd1757070949.png',
+        'edson-alvarez': 'https://r2.thesportsdb.com/images/media/player/cutout/nt933u1769179587.png',
+        'ochoa': 'https://r2.thesportsdb.com/images/media/player/cutout/2oh1dq1707692146.png',
+        'quinones': 'https://r2.thesportsdb.com/images/media/player/cutout/ol1x961719501112.png',
+        'cesar-huerta': 'https://r2.thesportsdb.com/images/media/player/cutout/u0d1li1768080617.png',
+        'alexis-vega': 'https://www.thesportsdb.com/images/media/player/cutout/0mmqo91776412620.png',
+        'gilberto-mora': 'https://www.thesportsdb.com/images/media/player/cutout/55a3re1780401807.png',
+        'messi': 'https://r2.thesportsdb.com/images/media/player/cutout/e0i2051750317027.png',
+        'ronaldo': 'https://r2.thesportsdb.com/images/media/player/cutout/a19jje1761592498.png',
+        'mbappe': 'https://r2.thesportsdb.com/images/media/player/cutout/h9u9vz1733653583.png',
+      };
+      const url = avatars[player.slug];
+      if (url) return `<img src="${url}" alt="${player.name}" style="width:100%;height:100%;object-fit:cover;">`;
       const initials = getPlayerInitial(player.name);
       const colors = { brazil: '#009c3b', mexico: '#ff6d00', argentina: '#75b8f8', portugal: '#e53935', france: '#1565c0' };
       const bg = colors[player.country] || '#666';
-      return `<div style="width:100%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff;font-family:Arial Black,sans-serif;">${initials}</div>`;
+      return `<div style="width:100%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff;">${initials}</div>`;
     }
 
     // ===== MAIN PAGE =====

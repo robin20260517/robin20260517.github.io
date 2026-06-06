@@ -606,7 +606,30 @@
       { id: 20, slug: "mbappe", name: "Kylian Mbappé", nameZh: "姆巴佩", country: "france", position: "前锋", tags: "世界杯最强流量，法国头牌", platform: "both", avatar: "https://api.sofascore.app/api/v1/player/719994/image", stats: { goals: 48, caps: 86, worldcups: 2, trophies: 18 } },
     ];
 
-    // Video types for each player
+    // Telegram channel video message ID mapping
+    const videoMsgIds = {
+      'neymar': [12,11,10,9,8],
+      'vinicius': [79,78,77,76,75],
+      'raphinha': [98,97,96],
+      'endrick': [44,43,42],
+      'alisson': [59,58,57],
+      'casemiro': [53,52,51],
+      'bruno-guimaraes': [56,55,54],
+      'marquinhos': [35,34,33],
+      'gabriel-magalhaes': [41,40,39],
+      'santiago-gimenez': [82,81,80],
+      'raul-jimenez': [95,94,93],
+      'edson-alvarez': [47,46,45],
+      'ochoa': [7,103,102],
+      'quinones': [101,100,99],
+      'cesar-huerta': [50,49,48],
+      'alexis-vega': [62,61,60],
+      'gilberto-mora': [38,37,36],
+      'messi': [21,22,19,20,17,18,15,16,13,14],
+      'ronaldo': [91,92,89,90,87,88,85,86,83,84],
+      'mbappe': [31,32,29,30,27,28,25,26,23,24]
+    };
+    const TG_CHANNEL = 'cmcn99874';
     const videoTypes = ['进球集锦', '搞笑糗事', '名场面', '技巧展示', '世界杯时刻'];
 
     // Share captions
@@ -692,41 +715,33 @@
       const lang = currentPlayer.platform === 'pro777' ? 'es' : 'pt';
       let videoCards = '';
       
-      // Determine video file pattern based on platform
-      const isBoth = currentPlayer.platform === 'both';
-      const maxVideos = isBoth ? 10 : 15; // both platforms have _pt and _es versions
+      const msgIds = videoMsgIds[currentPlayer.slug] || [];
       
-      for (let i = 1; i <= maxVideos; i++) {
-        const type = videoTypes[(i - 1) % videoTypes.length];
-        let videoSrc, displayLang;
-        
-        if (isBoth) {
-          // Alternate between pt and es versions
-          const num = Math.ceil(i / 2);
-          const suffix = i % 2 === 1 ? '_pt' : '_es';
-          displayLang = i % 2 === 1 ? 'PT' : 'ES';
-          videoSrc = `../public/output/${currentPlayer.slug}/${currentPlayer.slug}_${num}${suffix}.mp4`;
-        } else {
-          videoSrc = `../public/output/${currentPlayer.slug}/${currentPlayer.slug}_${i}.mp4`;
-          displayLang = lang.toUpperCase();
-        }
+      for (let i = 0; i < msgIds.length; i++) {
+        const type = videoTypes[i % videoTypes.length];
+        const msgId = msgIds[i];
+        const tgLink = `https://t.me/${TG_CHANNEL}/${msgId}`;
+        const displayLang = currentPlayer.platform === 'both' ? (i % 2 === 0 ? 'PT' : 'ES') : lang.toUpperCase();
         
         videoCards += `
           <div class="video-card">
-            <div class="video-preview" onclick="playVideo('${videoSrc}', '${currentPlayer.name}', ${i}, '${lang}')">
-              <video src="${videoSrc}" preload="metadata" muted></video>
-              <div class="play-overlay"><div class="play-icon">▶</div></div>
+            <div class="video-preview" onclick="playVideo('${tgLink}', '${currentPlayer.name}', ${i+1}, '${lang}')">
+              <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+                <div class="play-icon">▶</div>
+                <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);">Telegram</div>
+              </div>
             </div>
             <div class="video-card-info">
-              <div class="video-card-title">${currentPlayer.name} - ${type} #${i} [${displayLang}]</div>
+              <div class="video-card-title">${currentPlayer.name} - ${type} #${i+1} [${displayLang}]</div>
               <div class="video-card-type">${type} · 20s · 720P</div>
               <div class="video-share-row">
-                <button class="share-btn telegram" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i}, 'telegram', '${lang}')">✈️ Telegram</button>
-                <button class="share-btn whatsapp" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i}, 'whatsapp', '${lang}')">💬 WhatsApp</button>
+                <button class="share-btn telegram" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i+1}, 'telegram', '${lang}')">✈️ Telegram</button>
+                <button class="share-btn whatsapp" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i+1}, 'whatsapp', '${lang}')">💬 WhatsApp</button>
               </div>
             </div>
           </div>
         `;
+      }
       }
       document.getElementById('videoGrid').innerHTML = videoCards;
 
@@ -742,21 +757,13 @@
     }
 
     // ===== VIDEO MODAL =====
-    function playVideo(src, playerName, num, lang) {
-      currentVideoSrc = src;
-      const modal = document.getElementById('videoModal');
-      const video = document.getElementById('fullVideo');
-      video.src = src;
-      video.play();
-      modal.classList.add('active');
+    function playVideo(tgLink, playerName, num, lang) {
+      // Open Telegram video in new tab
+      window.open(tgLink, '_blank');
     }
 
     function closeVideoModal() {
-      const modal = document.getElementById('videoModal');
-      const video = document.getElementById('fullVideo');
-      video.pause();
-      video.src = '';
-      modal.classList.remove('active');
+      document.getElementById('videoModal').classList.remove('active');
     }
 
     function shareCurrentVideo(platform) {

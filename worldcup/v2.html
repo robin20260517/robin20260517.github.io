@@ -779,22 +779,11 @@
 
     // ===== VIDEO MODAL =====
     function playVideo(fileId, playerName, num) {
-      const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-      const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-      const modal = document.getElementById('videoModal');
-      const container = document.getElementById('fullVideo');
-      container.innerHTML = `
-        <div style="width:100%;max-width:400px;">
-          <iframe src="${embedUrl}" style="width:100%;height:70vh;border:none;border-radius:12px;" allow="autoplay;encrypted-media" allowfullscreen></iframe>
-        </div>
-      `;
-      modal.classList.add('active');
+      window.open('https://drive.google.com/file/d/' + fileId + '/preview', '_blank');
     }
 
     function closeVideoModal() {
-      const modal = document.getElementById('videoModal');
-      document.getElementById('fullVideo').innerHTML = '';
-      modal.classList.remove('active');
+      document.getElementById('videoModal').classList.remove('active');
     }
 
     function shareCurrentVideo(platform) {

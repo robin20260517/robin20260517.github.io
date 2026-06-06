@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚽ World Cup 2026 - Video Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.1);
+      --accent-brazil: #00c853;
+      --accent-mexico: #ff6d00;
+      --accent-gold: #ffd600;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Liquid background */
+    .liquid-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+    }
+
+    .liquid-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      animation: float 25s ease-in-out infinite;
+      opacity: 0.2;
+    }
+
+    .blob-1 { width: 500px; height: 500px; background: var(--accent-brazil); top: -150px; left: -100px; }
+    .blob-2 { width: 600px; height: 600px; background: var(--accent-mexico); bottom: -200px; right: -150px; animation-delay: -8s; }
+    .blob-3 { width: 350px; height: 350px; background: var(--accent-gold); top: 40%; left: 60%; animation-delay: -16s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -30px) scale(1.08); }
+      66% { transform: translate(-30px, 40px) scale(0.92); }
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 50px 20px 20px;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-gold), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.5);
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    /* Search */
+    .search-container {
+      max-width: 500px;
+      margin: 24px auto;
+      padding: 0 20px;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 14px 22px;
+      border-radius: 50px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .search-bar:focus { border-color: var(--accent-gold); }
+    .search-bar::placeholder { color: rgba(255,255,255,0.35); }
+
+    /* Filter */
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 7px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.85rem;
+    }
+
+    .filter-tab:hover, .filter-tab.active {
+      background: rgba(255,214,0,0.1);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    /* Players Grid - Clean cards */
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 0 24px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .player-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+
+    .player-card[data-country="brazil"]:hover { box-shadow: 0 20px 50px rgba(0,200,83,0.15); }
+    .player-card[data-country="mexico"]:hover { box-shadow: 0 20px 50px rgba(255,109,0,0.15); }
+    .player-card[data-country="argentina"]:hover { box-shadow: 0 20px 50px rgba(117,184,248,0.15); }
+    .player-card[data-country="portugal"]:hover { box-shadow: 0 20px 50px rgba(229,57,53,0.15); }
+    .player-card[data-country="france"]:hover { box-shadow: 0 20px 50px rgba(21,101,192,0.15); }
+
+    .player-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+      border: 2px solid var(--glass-border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+    }
+
+    .player-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .player-card .name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-card .name-zh {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+    }
+
+    .player-card .country-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.6);
+    }
+
+    .player-card .position-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 0.68rem;
+      background: rgba(255,214,0,0.1);
+      color: var(--accent-gold);
+    }
+
+    /* ===== DETAIL PAGE (二级页面) ===== */
+    .detail-page {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 100;
+      background: #0a0a0f;
+      overflow-y: auto;
+      animation: slideIn 0.3s ease;
+    }
+
+    .detail-page.active { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      border-bottom: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,15,0.9);
+      z-index: 10;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .detail-player-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .detail-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .detail-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-name h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .detail-name p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Stats bar */
+    .detail-stats {
+      display: flex;
+      gap: 20px;
+      padding: 20px 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 12px 20px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      min-width: 90px;
+    }
+
+    .stat-item .value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+
+    .stat-item .label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+
+    /* Video grid */
+    .videos-section {
+      padding: 16px 24px 40px;
+    }
+
+    .videos-section h3 {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .video-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .video-card:hover {
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .video-preview {
+      width: 100%;
+      aspect-ratio: 9/16;
+      max-height: 320px;
+      background: #111;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .video-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-preview .play-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.3);
+      opacity: 1;
+      transition: opacity 0.2s;
+    }
+
+    .video-preview:hover .play-overlay { opacity: 0.6; }
+
+    .play-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .video-card-info {
+      padding: 12px 14px;
+    }
+
+    .video-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .video-card-type {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 10px;
+    }
+
+    .video-share-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .share-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .share-btn:hover { transform: scale(1.03); }
+    .share-btn.telegram { background: #0088cc; color: #fff; }
+    .share-btn.whatsapp { background: #25d366; color: #fff; }
+
+    /* Fullscreen video modal */
+    .video-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .video-modal.active { display: flex; }
+
+    .video-modal video {
+      max-height: 75vh;
+      max-width: 90vw;
+      border-radius: 12px;
+    }
+
+    .video-modal .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-modal .modal-share-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .video-modal .modal-share-row .share-btn {
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    /* API section */
+    .api-section {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+
+    .api-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .api-card h3 { color: var(--accent-gold); margin-bottom: 8px; font-size: 1rem; }
+    .api-card p { color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 { font-size: 1.6rem; }
+      .players-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 0 12px 30px; }
+      .player-card { padding: 16px 12px; }
+      .player-avatar { width: 64px; height: 64px; }
+      .video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="liquid-bg">
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="liquid-blob blob-3"></div>
+  </div>
+
+  <!-- ===== 一级页面：球星列表 ===== -->
+  <div id="mainPage">
+    <header class="header">
+      <h1>🏆 World Cup 2026</h1>
+      <p>球星精彩视频 · 一键分享</p>
+    </header>
+
+    <div class="search-container">
+      <input type="text" class="search-bar" id="searchInput" placeholder="🔍 搜索球星..." oninput="filterPlayers()">
+    </div>
+
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="setFilter('all', this)">全部</div>
+      <div class="filter-tab" onclick="setFilter('brazil', this)">🇧🇷 巴西</div>
+      <div class="filter-tab" onclick="setFilter('mexico', this)">🇲🇽 墨西哥</div>
+      <div class="filter-tab" onclick="setFilter('argentina', this)">🇦🇷 阿根廷</div>
+      <div class="filter-tab" onclick="setFilter('portugal', this)">🇵🇹 葡萄牙</div>
+      <div class="filter-tab" onclick="setFilter('france', this)">🇫🇷 法国</div>
+    </div>
+
+    <div class="players-grid" id="playersGrid"></div>
+
+    <div class="api-section">
+      <div class="api-card">
+        <h3>🎨 AI 海报生成（即将上线）</h3>
+        <p>ChatGPT 图像 API · 比赛海报 · 赔率海报 · 一键生成分享</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 二级页面：球星详情 ===== -->
+  <div class="detail-page" id="detailPage">
+    <div class="detail-header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="detail-player-info">
+        <div class="detail-avatar" id="detailAvatar"></div>
+        <div class="detail-name">
+          <h2 id="detailName"></h2>
+          <p id="detailMeta"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-stats" id="detailStats"></div>
+
+    <div class="videos-section">
+      <h3>🎬 精彩视频集锦</h3>
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===== 视频全屏预览 ===== -->
+  <div class="video-modal" id="videoModal">
+    <button class="close-btn" onclick="closeVideoModal()">✕</button>
+    <video id="fullVideo" controls></video>
+    <div class="modal-share-row">
+      <button class="share-btn telegram" onclick="shareCurrentVideo('telegram')">✈️ Telegram</button>
+      <button class="share-btn whatsapp" onclick="shareCurrentVideo('whatsapp')">💬 WhatsApp</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== DATA =====
+    const players = [
+      { id: 1, slug: "neymar", name: "Neymar Jr.", nameZh: "内马尔", country: "brazil", position: "前锋", tags: "巴西头号流量，传奇回归", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/26764/image", stats: { goals: 79, caps: 128, worldcups: 3, trophies: 27 } },
+      { id: 2, slug: "vinicius", name: "Vinícius Júnior", nameZh: "维尼修斯", country: "brazil", position: "边锋", tags: "巴西现役最热门攻击手", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/719787/image", stats: { goals: 33, caps: 35, worldcups: 1, trophies: 14 } },
+      { id: 3, slug: "raphinha", name: "Raphinha", nameZh: "拉菲尼亚", country: "brazil", position: "边锋", tags: "爆点边锋，速度与突破", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/318837/image", stats: { goals: 14, caps: 40, worldcups: 1, trophies: 5 } },
+      { id: 4, slug: "endrick", name: "Endrick", nameZh: "恩德里克", country: "brazil", position: "前锋", tags: "新一代巴西天才", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/1104425/image", stats: { goals: 4, caps: 12, worldcups: 0, trophies: 2 } },
+      { id: 5, slug: "alisson", name: "Alisson", nameZh: "阿利松", country: "brazil", position: "门将", tags: "世界级门神", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/135467/image", stats: { goals: 0, caps: 70, worldcups: 2, trophies: 12 } },
+      { id: 6, slug: "casemiro", name: "Casemiro", nameZh: "卡塞米罗", country: "brazil", position: "中场", tags: "防守核心，硬汉队长", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/44792/image", stats: { goals: 7, caps: 75, worldcups: 2, trophies: 22 } },
+      { id: 7, slug: "bruno-guimaraes", name: "Bruno Guimarães", nameZh: "吉马良斯", country: "brazil", position: "中场", tags: "中场发动机", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/816498/image", stats: { goals: 3, caps: 20, worldcups: 0, trophies: 3 } },
+      { id: 8, slug: "marquinhos", name: "Marquinhos", nameZh: "马尔基尼奥斯", country: "brazil", position: "后卫", tags: "防线领袖", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/132683/image", stats: { goals: 8, caps: 90, worldcups: 2, trophies: 25 } },
+      { id: 9, slug: "gabriel-magalhaes", name: "Gabriel Magalhães", nameZh: "加布里埃尔", country: "brazil", position: "后卫", tags: "强硬中卫", platform: "brpx7", avatar: "https://api.sofascore.app/api/v1/player/366498/image", stats: { goals: 2, caps: 15, worldcups: 0, trophies: 4 } },
+      { id: 10, slug: "santiago-gimenez", name: "Santiago Giménez", nameZh: "圣地亚哥·希门尼斯", country: "mexico", position: "前锋", tags: "墨西哥新锋霸", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/947498/image", stats: { goals: 22, caps: 35, worldcups: 0, trophies: 3 } },
+      { id: 11, slug: "raul-jimenez", name: "Raúl Jiménez", nameZh: "劳尔·希门尼斯", country: "mexico", position: "前锋", tags: "老牌射手", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/178503/image", stats: { goals: 32, caps: 105, worldcups: 2, trophies: 5 } },
+      { id: 12, slug: "edson-alvarez", name: "Edson Álvarez", nameZh: "埃德森·阿尔瓦雷斯", country: "mexico", position: "中场", tags: "队长铁腰", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/800928/image", stats: { goals: 3, caps: 70, worldcups: 1, trophies: 6 } },
+      { id: 13, slug: "ochoa", name: "Guillermo Ochoa", nameZh: "奥乔亚", country: "mexico", position: "门将", tags: "世界杯神扑门将", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/7929/image", stats: { goals: 0, caps: 140, worldcups: 5, trophies: 8 } },
+      { id: 14, slug: "quinones", name: "Julián Quiñones", nameZh: "基尼奥内斯", country: "mexico", position: "前锋", tags: "归化攻击手", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/584898/image", stats: { goals: 8, caps: 18, worldcups: 0, trophies: 4 } },
+      { id: 15, slug: "cesar-huerta", name: "César Huerta", nameZh: "塞萨尔·韦尔塔", country: "mexico", position: "前锋/边锋", tags: "墨西哥边路爆点", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/947478/image", stats: { goals: 5, caps: 15, worldcups: 0, trophies: 1 } },
+      { id: 16, slug: "alexis-vega", name: "Alexis Vega", nameZh: "亚历克西斯·维加", country: "mexico", position: "前锋", tags: "本土人气攻击手", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/584912/image", stats: { goals: 10, caps: 45, worldcups: 1, trophies: 3 } },
+      { id: 17, slug: "gilberto-mora", name: "Gilberto Mora", nameZh: "吉尔伯托·莫拉", country: "mexico", position: "中场", tags: "17岁新星", platform: "pro777", avatar: "https://api.sofascore.app/api/v1/player/1326785/image", stats: { goals: 1, caps: 3, worldcups: 0, trophies: 0 } },
+      { id: 18, slug: "messi", name: "Lionel Messi", nameZh: "梅西", country: "argentina", position: "前锋", tags: "传奇最后一舞，卫冕冠军核心", platform: "both", avatar: "https://api.sofascore.app/api/v1/player/12994/image", stats: { goals: 109, caps: 187, worldcups: 5, trophies: 44 } },
+      { id: 19, slug: "ronaldo", name: "Cristiano Ronaldo", nameZh: "C罗", country: "portugal", position: "前锋", tags: "第六届世界杯，最后冲冠", platform: "both", avatar: "https://api.sofascore.app/api/v1/player/750/image", stats: { goals: 135, caps: 217, worldcups: 5, trophies: 35 } },
+      { id: 20, slug: "mbappe", name: "Kylian Mbappé", nameZh: "姆巴佩", country: "france", position: "前锋", tags: "世界杯最强流量，法国头牌", platform: "both", avatar: "https://api.sofascore.app/api/v1/player/719994/image", stats: { goals: 48, caps: 86, worldcups: 2, trophies: 18 } },
+    ];
+
+    // Video types for each player
+    const videoTypes = ['进球集锦', '搞笑糗事', '名场面', '技巧展示', '世界杯时刻'];
+
+    // Share captions
+    const captions = {
+      pt: [
+        "🇧🇷🔥 QUE GOLAÇO! Apoie o Brasil na Copa 2026!\n⚽ Cadastre-se agora: brpx7.com\n#Copa2026 #Brasil",
+        "🇧🇷⚽ CRAQUE DEMAIS! O Brasil vai com tudo!\n🏆 Bônus exclusivo: brpx7.com\n#WorldCup2026",
+        "🔥🇧🇷 JOGADA INCRÍVEL! Tá pronto pro Mundial?\n💰 Cadastre-se: brpx7.com\n#Futebol #Brasil",
+      ],
+      es: [
+        "🇲🇽🔥 ¡QUÉ GOLAZO! ¡Apoya a México en el Mundial 2026!\n⚽ Regístrate: pro777.mx\n#Mundial2026 #México",
+        "🇲🇽⚽ ¡CRACK TOTAL! ¡México va con todo!\n🏆 Bono exclusivo: pro777.mx\n#WorldCup2026",
+        "🔥🇲🇽 ¡JUGADA INCREÍBLE! ¿Listo para el Mundial?\n💰 Regístrate: pro777.mx\n#Fútbol #México",
+      ],
+    };
+
+    let currentFilter = 'all';
+    let currentPlayer = null;
+    let currentVideoSrc = '';
+
+    // ===== HELPERS =====
+    const flags = { brazil: '🇧🇷', mexico: '🇲🇽', argentina: '🇦🇷', portugal: '🇵🇹', france: '🇫🇷' };
+
+    function getPlayerInitial(name) {
+      return name.split(' ').map(w => w[0]).join('').substring(0, 2);
+    }
+
+    function renderAvatar(player, size) {
+      const initials = getPlayerInitial(player.name);
+      const colors = { brazil: '#009c3b', mexico: '#ff6d00', argentina: '#75b8f8', portugal: '#e53935', france: '#1565c0' };
+      const bg = colors[player.country] || '#666';
+      return `<div style="width:100%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff;font-family:Arial Black,sans-serif;">${initials}</div>`;
+    }
+
+    // ===== MAIN PAGE =====
+    function renderPlayers(list) {
+      document.getElementById('playersGrid').innerHTML = list.map(p => `
+        <div class="player-card" data-country="${p.country}" onclick="openPlayer(${p.id})">
+          <div class="player-avatar">${renderAvatar(p)}</div>
+          <div class="name">${p.name}</div>
+          <div class="name-zh">${p.nameZh}</div>
+          <div class="country-badge">${flags[p.country]} ${p.position}</div>
+          <div class="position-badge">🎬 15 视频</div>
+        </div>
+      `).join('');
+    }
+
+    function filterPlayers() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = players.filter(p => {
+        const matchSearch = !q || p.name.toLowerCase().includes(q) || p.nameZh.includes(q);
+        const matchFilter = currentFilter === 'all' || p.country === currentFilter;
+        return matchSearch && matchFilter;
+      });
+      renderPlayers(filtered);
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      filterPlayers();
+    }
+
+    // ===== DETAIL PAGE =====
+    function openPlayer(id) {
+      currentPlayer = players.find(p => p.id === id);
+      if (!currentPlayer) return;
+
+      document.getElementById('detailAvatar').innerHTML = renderAvatar(currentPlayer);
+      document.getElementById('detailName').textContent = currentPlayer.name;
+      document.getElementById('detailMeta').textContent = `${currentPlayer.nameZh} · ${flags[currentPlayer.country]} · ${currentPlayer.position} · ${currentPlayer.tags}`;
+
+      // Stats
+      document.getElementById('detailStats').innerHTML = `
+        <div class="stat-item"><div class="value">${currentPlayer.stats.goals}</div><div class="label">国家队进球</div></div>
+        <div class="stat-item"><div class="value">${currentPlayer.stats.caps}</div><div class="label">出场次数</div></div>
+        <div class="stat-item"><div class="value">${currentPlayer.stats.worldcups}</div><div class="label">世界杯</div></div>
+        <div class="stat-item"><div class="value">${currentPlayer.stats.trophies}</div><div class="label">冠军奖杯</div></div>
+      `;
+
+      // Videos
+      const lang = currentPlayer.platform === 'pro777' ? 'es' : 'pt';
+      let videoCards = '';
+      
+      // Determine video file pattern based on platform
+      const isBoth = currentPlayer.platform === 'both';
+      const maxVideos = isBoth ? 10 : 15; // both platforms have _pt and _es versions
+      
+      for (let i = 1; i <= maxVideos; i++) {
+        const type = videoTypes[(i - 1) % videoTypes.length];
+        let videoSrc, displayLang;
+        
+        if (isBoth) {
+          // Alternate between pt and es versions
+          const num = Math.ceil(i / 2);
+          const suffix = i % 2 === 1 ? '_pt' : '_es';
+          displayLang = i % 2 === 1 ? 'PT' : 'ES';
+          videoSrc = `../public/output/${currentPlayer.slug}/${currentPlayer.slug}_${num}${suffix}.mp4`;
+        } else {
+          videoSrc = `../public/output/${currentPlayer.slug}/${currentPlayer.slug}_${i}.mp4`;
+          displayLang = lang.toUpperCase();
+        }
+        
+        videoCards += `
+          <div class="video-card">
+            <div class="video-preview" onclick="playVideo('${videoSrc}', '${currentPlayer.name}', ${i}, '${lang}')">
+              <video src="${videoSrc}" preload="metadata" muted></video>
+              <div class="play-overlay"><div class="play-icon">▶</div></div>
+            </div>
+            <div class="video-card-info">
+              <div class="video-card-title">${currentPlayer.name} - ${type} #${i} [${displayLang}]</div>
+              <div class="video-card-type">${type} · 20s · 720P</div>
+              <div class="video-share-row">
+                <button class="share-btn telegram" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i}, 'telegram', '${lang}')">✈️ Telegram</button>
+                <button class="share-btn whatsapp" onclick="event.stopPropagation(); shareVideo('${currentPlayer.name}', ${i}, 'whatsapp', '${lang}')">💬 WhatsApp</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      document.getElementById('videoGrid').innerHTML = videoCards;
+
+      // Show detail page
+      document.getElementById('mainPage').style.display = 'none';
+      document.getElementById('detailPage').classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function goBack() {
+      document.getElementById('detailPage').classList.remove('active');
+      document.getElementById('mainPage').style.display = 'block';
+    }
+
+    // ===== VIDEO MODAL =====
+    function playVideo(src, playerName, num, lang) {
+      currentVideoSrc = src;
+      const modal = document.getElementById('videoModal');
+      const video = document.getElementById('fullVideo');
+      video.src = src;
+      video.play();
+      modal.classList.add('active');
+    }
+
+    function closeVideoModal() {
+      const modal = document.getElementById('videoModal');
+      const video = document.getElementById('fullVideo');
+      video.pause();
+      video.src = '';
+      modal.classList.remove('active');
+    }
+
+    function shareCurrentVideo(platform) {
+      if (!currentPlayer) return;
+      const lang = currentPlayer.platform === 'pro777' ? 'es' : 'pt';
+      shareVideo(currentPlayer.name, 1, platform, lang);
+    }
+
+    // ===== SHARE =====
+    function shareVideo(playerName, videoNum, platform, lang) {
+      const captionList = captions[lang] || captions.pt;
+      const caption = captionList[(videoNum - 1) % captionList.length];
+      const fullText = `${playerName} ⚽🔥\n\n${caption}`;
+      const encoded = encodeURIComponent(fullText);
+
+      if (platform === 'telegram') {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent('https://t.me/+msaMIYQFudRkNTg8')}&text=${encoded}`, '_blank');
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+      }
+    }
+
+    // ===== KEYBOARD =====
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('videoModal').classList.contains('active')) {
+          closeVideoModal();
+        } else if (document.getElementById('detailPage').classList.contains('active')) {
+          goBack();
+        }
+      }
+    });
+
+    // ===== INIT =====
+    renderPlayers(players);
+  </script>
+</body>
+</html>

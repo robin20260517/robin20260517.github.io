@@ -606,30 +606,29 @@
       { id: 20, slug: "mbappe", name: "Kylian Mbappé", nameZh: "姆巴佩", country: "france", position: "前锋", tags: "世界杯最强流量，法国头牌", platform: "both", avatar: "https://api.sofascore.app/api/v1/player/719994/image", stats: { goals: 48, caps: 86, worldcups: 2, trophies: 18 } },
     ];
 
-    // Telegram channel video message ID mapping
-    const videoMsgIds = {
-      'neymar': [12,11,10,9,8],
-      'vinicius': [79,78,77,76,75],
-      'raphinha': [98,97,96],
-      'endrick': [44,43,42],
-      'alisson': [59,58,57],
-      'casemiro': [53,52,51],
-      'bruno-guimaraes': [56,55,54],
-      'marquinhos': [35,34,33],
-      'gabriel-magalhaes': [41,40,39],
-      'santiago-gimenez': [82,81,80],
-      'raul-jimenez': [95,94,93],
-      'edson-alvarez': [47,46,45],
-      'ochoa': [7,103,102],
-      'quinones': [101,100,99],
-      'cesar-huerta': [50,49,48],
-      'alexis-vega': [62,61,60],
-      'gilberto-mora': [38,37,36],
-      'messi': [21,22,19,20,17,18,15,16,13,14],
-      'ronaldo': [91,92,89,90,87,88,85,86,83,84],
-      'mbappe': [31,32,29,30,27,28,25,26,23,24]
+    // Google Drive video IDs
+    const driveIds = {
+      'alexis-vega': ['18Bg4_nK4MkbNyQ703ES0xG3HAVWh6826','1c00izLFP9PQu7wci0g9Qar-caww8LYS4','1YQF1rx09iEC33oh4X3oIeOS55ZXvnyuK'],
+      'alisson': ['1m4Oz-AtaI6aXhEKxq-GMd_ZDDciBP_yX','1iPBVbTK1FCeulOc4ZbYf204jIu1lJnps','16uQlgtk7_nbRgwu0u2_kA5smUBNJS_2_'],
+      'bruno-guimaraes': ['1gOoey7N5YYPMKKRb-J7h0PVKRFv6MxGK','1_SrTWGHG8A_I7mnNoLF3Pdoh44qDqOba','1UYLuQsToEMO2lvk4WSn5p6RbA2DutBkl'],
+      'casemiro': ['11I1LsO5asrNC7eV2E1I4wlpl_Ou6kuiP','17GbCWCdw8E2NjciWAj_s9CgHxx7rNPl5','1XU3Cp7Uu_7ypiVjiQZd7NAzAoow-KeCF'],
+      'cesar-huerta': ['12x5fCcW20JMnO_fyd8fGePN81jTJpJES','1lso7rsb0xQ8PZ4C7Mnbq3hNWJ3BssKRq','1jfWQgTSA_1IXh9CxeDd21j7nXAMbVlbh'],
+      'edson-alvarez': ['199uE7weFFNtfeaITDGUqNs7ke3ZhA0m5','11fnjyb1su1uKbLtqBxiMHUqp3BNnr80P','1Fu4Z76zEjsieq_XRM4_lXzDlVWhwb61J'],
+      'endrick': ['1HyQ6a_VOvwFbF1SWYCc1wmEBfHVQhlpp','1T45z9v04ISlGQ1BJmYqDHAMDOWmAULH-','1acCMIXzvhA-pu1_iywcrloOuZCR1H6-0'],
+      'gabriel-magalhaes': ['1TGY1DfAWyW-Qdzsp8ATCZw9QPBj5Bu8c','1CsDM6yubFloGfORtGFmrTc40K7hAoEoV','1JLEOOfcpiTNxK7E3U4m4wiw4sIGuYoZc'],
+      'gilberto-mora': ['1nBpx3LXaJ46nypy96LwyQ0Vx96G4ewr4','12vJNSL3-syOTJ6mhdf3rCGeSQFOD4KU1','1EinYY57Gbc_o9HZassLqSPz9lZdcnK9W'],
+      'marquinhos': ['1dUixfdNhPQaE4bEQbqfFXP3IWZRqPCFj','144jGcGc_Je8fIESxlehnYHm1hleDElt5','1xs1Q5GkinSrwiuZiBi0TyhASxpvaO6RI'],
+      'mbappe': ['1G6rrmrn1va-eJean0hrdHsASBXM7h76E','1W0REtWXM4oa0qXtdCZPj9c8cfGuqcH8x','16ZutMiV-j0EhArMwCYHeGNhEOdbDijmQ','1lch_-NASJCFVOj1d4Wmi4df1nG36wWfQ','1YHXA1DwzcDf_TnNDvFCcWfbKM4RBQsSX','1S1ZBkF3M3aK7p1JylYKF_wPE35Eb5Izl','1CeX7fugi9wBjjrpu5Xg56BWclAcWswYG','1iMLpIoPqLI4nK3bs-IylnYF7y20VnjJN','1dLSmKlU0TPy7qXgtqTN1Tmqax__V8TyY','1dP5-NtqT8NFBTVv6Iq_dITaIejfJ5mOm'],
+      'messi': ['1G2Lb6eaAGGtbTN6o8hRpwFNFr1N8ul9o','1gO1lvXmHdKy9qhtJw8rv4uM24obY3K81','1lIgMm9sZi7Exg4_HUWdjGEWFTucHaZzf','1VG8t6GZ-F0u76t0lPKKhjEeemRh-aYKF','1WTCssiNp0RMI4r_wQbiX_KroYiJ4Cq2Y','1qLxlXg41LHaHtSFFqUCK8DeuaDW3DF22','19a5-_mwuqYRICfqXUwZSWBZmXOhmi9Ia','1cFgrOnVBG3_mOPZ0r3JnSn4cQV9zsnYl','1Iah9s6Sj7TBhb1TStk2qPZy_CuXw98Y9','19wkdPTAEr1YbCcY_qJwNR1hc7FnObDuz'],
+      'neymar': ['1EoeF1ny1zcG4_hhRIUIWbwpsRfdFcW81','1lcVf0U8kfp4duIxYOu-GvEQycYUsb8zW','1QFNY0Y7FZb--VcWA97AB2fwF0ADM-0bJ','1y8BQd-7YB7ET-UmhF3akQOYktPILiiJY','13LYy-pB2UfK3JnwMyg20aO_QbfFYZ4MU'],
+      'ochoa': ['1gIYNZW-KLj8lB9qN5S9rzKqOCqT9XRHt','1-FvVVpNmBpXzVS3Vzc8t5A6DUGOXvtEu','1m2aJFoiSCHEJS4i1ajOT3khDcvEOazTo'],
+      'quinones': ['1_tQWtBk1xDdnkoEFZzKg_mncV4eLtckG','1WsL00hgNHltANXeeqDGw06VvigcsziT7','1zRp6okxvmkQuR5b9NLeuh_nVtSc2UI48'],
+      'raphinha': ['1UeVyw-RM6ZATnWjSvB0kP9MB1cluL_5F','1WoQk4aPXxW8x-ttYDMpMBHzAO7JiO4oC','1qv-DIWnOr1SpHTtONp6tg1VWkt2vYure'],
+      'raul-jimenez': ['1M1bmVBZc0pvTdWbX_E64nUNhP9wGZHxT','1sSpA3gQZH85aPx1-fCupR8_7FHsVq43k','17__Nzh462uyjZajUMXTclKD3tZgrUJK7'],
+      'ronaldo': ['1cCextI2U3-yxfmLKhNn3HCLLMxm2-1aw','1C9BfAtF4OnAOtwQXMW1Xw7lxJs3z5Mjd','14JMtuVg-_o2e1mQMZzqLjXeuxfKQgq_9','1JpzxjvUneIV6A0ofyM8qPF1Oa1guv3wD','12AoH0fhTcPbUlBHim4NQFA7EGLKggHir','1FfxtQHleVUlkj1wsD0rvo0eCwzhis3-i','1G-7ORsaUPk0Khg30N8UOPh77JGM2LcqZ','1QUsX0s5BzbLqRdIuMCQjXVptPokXdpX3','1iWIEZSrC9oQr7OgC4tWAh72JqnGtENYh','1wU6vPwu3P69_fazUtFNmA69Cr8M3KCOC'],
+      'santiago-gimenez': ['1_UF1ZjHNAP6-RIqIgiZJGTnBh0Imjmie','1n_VPV3nWLIUYHTw25S60GAAOjodRwu8g','1PGAJpxzsmcqIfru0q8Yug7FvOV714gWT'],
+      'vinicius': ['1Syeetlk2u9eBngOJPfQh0eYiUo0x0uI9','1lKgJPmncupwyCALOkE5ZqEqv35stN2nz','17F2jv0hlB-tE3DQfv7QhsCnD22e751hm','16QR4nA22gnQpXas1Nf3sNeJPbi0jN62c','1j9MhVAhNIk5CoZwajyip_IaTVk0al2mv']
     };
-    const TG_CHANNEL = 'cmcn99874';
     const videoTypes = ['进球集锦', '搞笑糗事', '名场面', '技巧展示', '世界杯时刻'];
 
     // Share captions
@@ -715,20 +714,19 @@
       const lang = currentPlayer.platform === 'pro777' ? 'es' : 'pt';
       let videoCards = '';
       
-      const msgIds = videoMsgIds[currentPlayer.slug] || [];
+      const ids = driveIds[currentPlayer.slug] || [];
       
-      for (let i = 0; i < msgIds.length; i++) {
+      for (let i = 0; i < ids.length; i++) {
         const type = videoTypes[i % videoTypes.length];
-        const msgId = msgIds[i];
-        const tgLink = `https://t.me/${TG_CHANNEL}/${msgId}`;
+        const fileId = ids[i];
+        const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
         const displayLang = currentPlayer.platform === 'both' ? (i % 2 === 0 ? 'PT' : 'ES') : lang.toUpperCase();
         
         videoCards += `
           <div class="video-card">
-            <div class="video-preview" onclick="playVideo('${tgLink}', '${currentPlayer.name}', ${i+1}, '${lang}')">
-              <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+            <div class="video-preview" onclick="playVideo('${fileId}', '${currentPlayer.name}', ${i+1})">
+              <div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;">
                 <div class="play-icon">▶</div>
-                <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);">Telegram</div>
               </div>
             </div>
             <div class="video-card-info">
@@ -756,12 +754,11 @@
     }
 
     // ===== VIDEO MODAL =====
-    function playVideo(tgLink, playerName, num, lang) {
-      const msgId = tgLink.split('/').pop();
-      const embedUrl = `https://t.me/${TG_CHANNEL}/${msgId}?embed=1&mode=video`;
+    function playVideo(fileId, playerName, num) {
+      const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
       const modal = document.getElementById('videoModal');
       const container = document.getElementById('fullVideo');
-      container.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:75vh;border:none;border-radius:12px;" allowfullscreen></iframe>`;
+      container.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:70vh;border:none;border-radius:12px;" allow="autoplay" allowfullscreen></iframe>`;
       modal.classList.add('active');
     }
 

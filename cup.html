@@ -549,6 +549,37 @@
 
     <div class="players-grid" id="playersGrid"></div>
 
+    <!-- UGC Prediction Section -->
+    <div class="api-section" style="margin-top:30px;">
+      <h2 style="text-align:center;font-size:1.4rem;margin-bottom:20px;background:linear-gradient(135deg,var(--accent-gold),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">UGC 赛前预测包</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+        <!-- Brazil -->
+        <div class="api-card" style="text-align:left;padding:20px;cursor:pointer;" onclick="openPredictions('brazil')">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#009c3b;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🇧🇷</div>
+            <div>
+              <div style="font-weight:700;font-size:1rem;">Brasil Predictions</div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Palpites da torcida brasileira</div>
+            </div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--accent-brazil);">2 videos · 50s · Portugues</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:6px;">CTA: BRPX7 — nao fique de fora.</div>
+        </div>
+        <!-- Mexico -->
+        <div class="api-card" style="text-align:left;padding:20px;cursor:pointer;" onclick="openPredictions('mexico')">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#ff6d00;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🇲🇽</div>
+            <div>
+              <div style="font-weight:700;font-size:1rem;">Mexico Predictions</div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Pronosticos de la aficion mexicana</div>
+            </div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--accent-mexico);">1 video · 50s · Espanol</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:6px;">CTA: PRO777 — entra antes del gol.</div>
+        </div>
+      </div>
+    </div>
+
     <div class="api-section">
       <div class="api-card">
         <h3>🎨 AI 海报生成（即将上线）</h3>
@@ -814,6 +845,61 @@
       } else {
         window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
       }
+    }
+
+    // ===== PREDICTIONS =====
+    const predictionVideos = {
+      brazil: [
+        { name: 'Brasil Prediction #1', driveId: '', type: 'Palpite torcida' },
+        { name: 'Brasil Prediction #2', driveId: '', type: 'Palpite torcida' },
+      ],
+      mexico: [
+        { name: 'Mexico Prediction #1', driveId: '', type: 'Pronostico aficion' },
+      ]
+    };
+
+    function openPredictions(country) {
+      const videos = predictionVideos[country] || [];
+      const title = country === 'brazil' ? 'Brasil - Palpites UGC' : 'Mexico - Pronosticos UGC';
+      const flag = country === 'brazil' ? '🇧🇷' : '🇲🇽';
+
+      document.getElementById('detailAvatar').innerHTML = `<div style="width:100%;height:100%;background:${country==='brazil'?'#009c3b':'#ff6d00'};display:flex;align-items:center;justify-content:center;font-size:1.8rem;">${flag}</div>`;
+      document.getElementById('detailName').textContent = title;
+      document.getElementById('detailMeta').textContent = country === 'brazil' ? 'UGC · Torcida brasileira · Copa 2026' : 'UGC · Aficion mexicana · Mundial 2026';
+      document.getElementById('detailStats').innerHTML = `
+        <div class="stat-item"><div class="value">${videos.length}</div><div class="label">Videos</div></div>
+        <div class="stat-item"><div class="value">50s</div><div class="label">Duracion</div></div>
+        <div class="stat-item"><div class="value">720P</div><div class="label">Calidad</div></div>
+      `;
+
+      const lang = country === 'brazil' ? 'pt' : 'es';
+      let videoCards = '';
+      videos.forEach((v, i) => {
+        videoCards += `
+          <div class="video-card">
+            <div class="video-preview" onclick="playVideo('${v.driveId}', '${v.name}', ${i+1})">
+              <div style="width:100%;height:100%;background:linear-gradient(${135+i*45}deg,${country==='brazil'?'#003d00,#00c853':'#3d1500,#ff6d00'});display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at ${30+i*20}% 40%,rgba(255,255,255,0.1) 0%,transparent 50%);"></div>
+                <div style="font-size:2.5rem;font-weight:900;color:rgba(255,255,255,0.15);position:absolute;top:15%;font-family:Arial Black;">#${i+1}</div>
+                <div class="play-icon">▶</div>
+                <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);font-weight:600;">${v.type}</div>
+              </div>
+            </div>
+            <div class="video-card-info">
+              <div class="video-card-title">${v.name}</div>
+              <div class="video-card-type">${v.type} · 50s · 720P</div>
+              <div class="video-share-row">
+                <button class="share-btn telegram" onclick="event.stopPropagation(); shareVideo('${v.name}', ${i+1}, 'telegram', '${lang}')">✈️ Telegram</button>
+                <button class="share-btn whatsapp" onclick="event.stopPropagation(); shareVideo('${v.name}', ${i+1}, 'whatsapp', '${lang}')">💬 WhatsApp</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('videoGrid').innerHTML = videoCards;
+      document.getElementById('mainPage').style.display = 'none';
+      document.getElementById('detailPage').classList.add('active');
+      window.scrollTo(0, 0);
     }
 
     // ===== KEYBOARD =====
